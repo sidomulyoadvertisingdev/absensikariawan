@@ -1,75 +1,90 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
-import MobileLayout from "../layout/MobileLayout";
 
-export default function Lembur() {
-  const [list, setList] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function Login() {
+  const navigate = useNavigate();
 
-  const loadData = async () => {
-    const res = await api.get("/lembur");
-    setList(res.data.data);
-    setLoading(false);
-  };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-  const selesai = async (id) => {
-    await api.post(`/lembur/${id}/finish`);
-    await loadData();
+    try {
+      const res = await api.post("/login", {
+        email,
+        password,
+      });
+
+      // SIMPAN DATA LOGIN
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("name", res.data.user.name);
+      localStorage.setItem("email", res.data.user.email);
+      localStorage.setItem("role", res.data.user.role);
+
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      setError("Email atau password salah");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <MobileLayout title="Lembur">
-      {loading ? (
-        <p className="text-center text-gray-500">Loading...</p>
-      ) : (
-        <div className="space-y-3">
-          {list.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-xl shadow p-3"
-            >
-              <p className="font-semibold">{item.tanggal}</p>
-              <p className="text-sm">
-                {item.jam_mulai} - {item.jam_selesai}
-              </p>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <div className="w-full max-w-sm bg-white rounded-xl shadow p-6">
+        <h1 className="text-xl font-semibold text-center mb-2">
+          Login
+        </h1>
+        <p className="text-sm text-gray-500 text-center mb-6">
+          Silakan masuk untuk melanjutkan
+        </p>
 
-              <p className="text-xs text-gray-500">
-                {item.keterangan || "-"}
-              </p>
+        {error && (
+          <div className="mb-4 text-sm text-red-600 bg-red-50 p-2 rounded">
+            {error}
+          </div>
+        )}
 
-              {/* STATUS */}
-              <span
-                className={`inline-block mt-2 px-2 py-1 text-xs rounded
-                ${
-                  item.status === "finished"
-                    ? "bg-green-100 text-green-700"
-                    : item.status === "approved"
-                    ? "bg-blue-100 text-blue-700"
-                    : item.status === "requested"
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-red-100 text-red-700"
-                }`}
-              >
-                {item.status}
-              </span>
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="block text-sm mb-1">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200"
+              placeholder="email@example.com"
+              required
+            />
+          </div>
 
-              {/* ACTION */}
-              {item.status === "approved" && (
-                <button
-                  onClick={() => selesai(item.id)}
-                  className="mt-2 w-full bg-green-600 text-white py-2 rounded"
-                >
-                  Selesai Lembur
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </MobileLayout>
+          <div>
+            <label className="block text-sm mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+          >
+            {loading ? "Loading..." : "Login"}
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }

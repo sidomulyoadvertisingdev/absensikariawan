@@ -13,17 +13,26 @@ export default function BottomNav() {
           🏠
           <span>Home</span>
         </NavLink>
+
         <NavLink to="/absensi" className={linkClass}>
           🕒
           <span>Absensi</span>
         </NavLink>
+
         <NavLink to="/jadwal" className={linkClass}>
           📅
           <span>Jadwal</span>
         </NavLink>
+
         <NavLink to="/gaji" className={linkClass}>
           💰
           <span>Gaji</span>
+        </NavLink>
+
+        {/* ===== PROFILE ===== */}
+        <NavLink to="/profile" className={linkClass}>
+          👤
+          <span>Profile</span>
         </NavLink>
       </div>
     </nav>

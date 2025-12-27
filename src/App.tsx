@@ -11,34 +11,30 @@ import Absensi from "./pages/Absensi";
 import Jadwal from "./pages/Jadwal";
 import Gaji from "./pages/Gaji";
 import Lembur from "./pages/Lembur";
+import Profile from "./pages/Profile";
 
 import RequireAuth from "./auth/RequireAuth";
 
 export default function App() {
   const token = localStorage.getItem("token");
+  const isAuth = token && token !== "null";
 
   return (
-    <BrowserRouter
-      future={{
-        v7_relativeSplatPath: true,
-      }}
-    >
+    <BrowserRouter>
       <Routes>
-        {/* ================= ROOT ================= */}
+        {/* ROOT */}
         <Route
           path="/"
-          element={<Navigate to={token ? "/dashboard" : "/login"} replace />}
+          element={<Navigate to={isAuth ? "/dashboard" : "/login"} replace />}
         />
 
-        {/* ================= LOGIN ================= */}
+        {/* LOGIN */}
         <Route
           path="/login"
-          element={
-            token ? <Navigate to="/dashboard" replace /> : <Login />
-          }
+          element={isAuth ? <Navigate to="/dashboard" replace /> : <Login />}
         />
 
-        {/* ================= PROTECTED ROUTES ================= */}
+        {/* PROTECTED */}
         <Route
           path="/dashboard"
           element={
@@ -84,7 +80,16 @@ export default function App() {
           }
         />
 
-        {/* ================= FALLBACK ================= */}
+        <Route
+          path="/profile"
+          element={
+            <RequireAuth>
+              <Profile />
+            </RequireAuth>
+          }
+        />
+
+        {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
