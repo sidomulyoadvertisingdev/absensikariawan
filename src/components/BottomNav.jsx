@@ -1,39 +1,54 @@
 import { NavLink } from "react-router-dom";
+import {
+  HiOutlineHome,
+  HiOutlineClock,
+  HiOutlineCalendar,
+  HiOutlineCash,
+  HiOutlineUser,
+} from "react-icons/hi";
 
 export default function BottomNav() {
   const linkClass = ({ isActive }) =>
-    `flex flex-col items-center text-xs ${
-      isActive ? "text-blue-600" : "text-gray-400"
+    `flex flex-col items-center text-xs transition ${
+      isActive
+        ? "text-blue-600 font-semibold"
+        : "text-gray-400"
     }`;
 
   return (
-    <nav className="fixed bottom-0 w-full max-w-[430px] bg-white border-t">
+    <nav className="fixed bottom-0 w-full max-w-[430px] bg-white border-t z-20">
       <div className="h-16 flex justify-around items-center">
+
+        {/* ===== DASHBOARD ===== */}
         <NavLink to="/dashboard" className={linkClass}>
-          🏠
-          <span>Home</span>
+          <HiOutlineHome size={22} />
+          <span className="text-[11px] mt-0.5">Home</span>
         </NavLink>
 
+        {/* ===== ABSENSI ===== */}
         <NavLink to="/absensi" className={linkClass}>
-          🕒
-          <span>Absensi</span>
+          <HiOutlineClock size={22} />
+          <span className="text-[11px] mt-0.5">Absensi</span>
         </NavLink>
 
+        {/* ===== JADWAL ===== */}
         <NavLink to="/jadwal" className={linkClass}>
-          📅
-          <span>Jadwal</span>
+          <HiOutlineCalendar size={22} />
+          <span className="text-[11px] mt-0.5">Jadwal</span>
         </NavLink>
 
+        {/* ===== GAJI ===== */}
         <NavLink to="/gaji" className={linkClass}>
-          💰
-          <span>Gaji</span>
+          <HiOutlineCash size={22} />
+          <span className="text-[11px] mt-0.5">Gaji</span>
         </NavLink>
 
         {/* ===== PROFILE ===== */}
         <NavLink to="/profile" className={linkClass}>
-          👤
-          <span>Profile</span>
+          <HiOutlineUser size={22} />
+          <span className="text-[11px] mt-0.5">Profil</span>
         </NavLink>
+
       </div>
     </nav>
   );

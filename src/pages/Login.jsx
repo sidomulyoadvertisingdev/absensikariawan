@@ -5,85 +5,145 @@ import api from "../api/axios";
 export default function Login() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = async (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
+      /**
+       * 🔑 PENTING
+       * Backend Laravel VALIDASI PAKAI `email`
+       * UI tetap boleh tulis "Username"
+       */
       const res = await api.post("/login", {
-        email,
-        password,
+        email: username,     // ✅ INI KUNCI (bukan username)
+        password: password,
       });
 
-      // SIMPAN DATA LOGIN
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem("name", res.data.user.name);
-      localStorage.setItem("email", res.data.user.email);
-      localStorage.setItem("role", res.data.user.role);
-
-      navigate("/dashboard", { replace: true });
+      navigate("/dashboard");
     } catch (err) {
-      setError("Email atau password salah");
+      setError(
+        err.response?.data?.message ||
+          "Username atau password salah"
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-sm bg-white rounded-xl shadow p-6">
-        <h1 className="text-xl font-semibold text-center mb-2">
-          Login
-        </h1>
-        <p className="text-sm text-gray-500 text-center mb-6">
-          Silakan masuk untuk melanjutkan
-        </p>
+    <div className="min-h-screen bg-[#0f2f4f] flex justify-center">
+      <div className="w-full max-w-[430px] relative">
 
-        {error && (
-          <div className="mb-4 text-sm text-red-600 bg-red-50 p-2 rounded">
-            {error}
+        {/* ===== BACKGROUND IMAGE (ATAS SAJA) ===== */}
+        <div
+          className="h-56 w-full bg-cover bg-center"
+          style={{
+            backgroundImage: "url('/login-bg.jpg')",
+          }}
+        >
+          <div className="w-full h-full bg-black/30" />
+        </div>
+
+        {/* ===== FORM CARD ===== */}
+        <div className="-mt-20 px-6">
+          <div className="bg-[#143d63] rounded-3xl p-6 shadow-xl">
+
+            {/* TITLE */}
+            <h1 className="text-white text-2xl font-bold text-center">
+              Welcome Back
+            </h1>
+            <p className="text-center text-gray-300 text-sm mt-1">
+              Login to your account
+            </p>
+
+            {/* ERROR */}
+            {error && (
+              <div className="mt-4 bg-red-100 text-red-600 text-sm p-2 rounded">
+                {error}
+              </div>
+            )}
+
+            {/* FORM */}
+            <form onSubmit={submit} className="mt-6 space-y-4">
+
+              {/* USERNAME / EMAIL */}
+              <div>
+                <label className="text-sm text-gray-300">
+                  Username / Email
+                </label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  className="mt-1 w-full rounded-lg bg-gray-100 px-3 py-2 outline-none"
+                />
+              </div>
+
+              {/* PASSWORD */}
+              <div>
+                <label className="text-sm text-gray-300">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="mt-1 w-full rounded-lg bg-gray-100 px-3 py-2 outline-none pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                  >
+                    {showPassword ? "🙈" : "👁"}
+                  </button>
+                </div>
+              </div>
+
+              {/* REMEMBER */}
+              <div className="flex justify-between items-center text-sm text-gray-300">
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" />
+                  Remember me
+                </label>
+                <span className="text-gray-200">
+                  Forgot Password
+                </span>
+              </div>
+
+              {/* BUTTON */}
+              <button
+                disabled={loading}
+                className="w-full bg-orange-400 hover:bg-orange-500 text-white py-3 rounded-xl font-semibold transition disabled:opacity-60"
+              >
+                {loading ? "Logging in..." : "Login"}
+              </button>
+            </form>
+
+            {/* INFO */}
+            <p className="text-center text-gray-300 text-sm mt-6">
+              Jika belum punya akses login,
+              <br />
+              silakan hubungi{" "}
+              <span className="text-white font-semibold">
+                Admin
+              </span>
+            </p>
+
           </div>
-        )}
-
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200"
-              placeholder="email@example.com"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
-          >
-            {loading ? "Loading..." : "Login"}
-          </button>
-        </form>
+        </div>
       </div>
     </div>
   );

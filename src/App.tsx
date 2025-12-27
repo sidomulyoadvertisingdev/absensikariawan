@@ -16,23 +16,14 @@ import Profile from "./pages/Profile";
 import RequireAuth from "./auth/RequireAuth";
 
 export default function App() {
-  const token = localStorage.getItem("token");
-  const isAuth = token && token !== "null";
-
   return (
     <BrowserRouter>
       <Routes>
         {/* ROOT */}
-        <Route
-          path="/"
-          element={<Navigate to={isAuth ? "/dashboard" : "/login"} replace />}
-        />
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
         {/* LOGIN */}
-        <Route
-          path="/login"
-          element={isAuth ? <Navigate to="/dashboard" replace /> : <Login />}
-        />
+        <Route path="/login" element={<Login />} />
 
         {/* PROTECTED */}
         <Route
@@ -90,7 +81,7 @@ export default function App() {
         />
 
         {/* FALLBACK */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );

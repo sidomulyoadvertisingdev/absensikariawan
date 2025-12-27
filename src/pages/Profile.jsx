@@ -14,40 +14,67 @@ export default function Profile() {
     navigate("/login", { replace: true });
   };
 
+  const initial =
+    name && name.length > 0
+      ? name.charAt(0).toUpperCase()
+      : "?";
+
   return (
     <MobileLayout title="Profile">
-      {/* INFO USER */}
-      <div className="bg-white rounded-xl shadow p-4 mb-4">
-        <p className="text-sm text-gray-500 mb-2">Informasi Akun</p>
+      {/* ================= HEADER ================= */}
+      <div className="bg-blue-600 text-white rounded-xl p-4 mb-4 shadow flex items-center gap-4">
+        <div className="w-14 h-14 rounded-full bg-white text-blue-600 flex items-center justify-center text-2xl font-bold">
+          {initial}
+        </div>
 
-        <div className="space-y-1 text-sm">
-          <p>
-            <span className="text-gray-500">Login sebagai</span>
-            <br />
-            <span className="font-semibold">{name || "-"}</span>
+        <div>
+          <p className="text-sm opacity-80">
+            Login sebagai
           </p>
-
-          <p>
-            <span className="text-gray-500">Email</span>
-            <br />
-            <span className="font-semibold">{email || "-"}</span>
+          <p className="font-semibold text-lg">
+            {name || "-"}
           </p>
-
-          <p>
-            <span className="text-gray-500">Role</span>
-            <br />
-            <span className="font-semibold capitalize">
-              {role || "user"}
-            </span>
+          <p className="text-xs opacity-80">
+            {role || "user"}
           </p>
         </div>
       </div>
 
-      {/* AKSI */}
+      {/* ================= INFO AKUN ================= */}
+      <div className="bg-white rounded-xl shadow p-4 mb-4">
+        <p className="text-sm font-semibold mb-3 text-gray-700">
+          INFORMASI AKUN
+        </p>
+
+        <div className="space-y-3 text-sm">
+          <div>
+            <p className="text-gray-500">Nama</p>
+            <p className="font-semibold text-gray-800">
+              {name || "-"}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-gray-500">Email</p>
+            <p className="font-semibold text-gray-800">
+              {email || "-"}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-gray-500">Role</p>
+            <p className="font-semibold capitalize text-gray-800">
+              {role || "user"}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ================= AKSI ================= */}
       <div className="bg-white rounded-xl shadow p-4">
         <button
           onClick={handleLogout}
-          className="w-full bg-red-600 text-white py-2 rounded-lg"
+          className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-semibold transition"
         >
           Logout
         </button>

@@ -61,70 +61,25 @@ export default function Dashboard() {
   if (loading) {
     return (
       <MobileLayout title="Dashboard">
-        <p className="text-center text-gray-500">Loading...</p>
+        <div className="space-y-4 animate-pulse">
+          <div className="h-24 bg-gray-200 rounded-xl" />
+          <div className="h-14 bg-gray-200 rounded-xl" />
+          <div className="h-32 bg-gray-200 rounded-xl" />
+          <div className="h-40 bg-gray-200 rounded-xl" />
+        </div>
       </MobileLayout>
     );
   }
 
   return (
     <MobileLayout title="Dashboard">
-      {/* HEADER TANGGAL */}
-      <div className="mb-4">
-        <p className="text-sm text-gray-500">Hari ini</p>
-        <p className="text-lg font-bold capitalize">{tanggalHariIni}</p>
-      </div>
-
-      {/* STATUS ABSENSI */}
-      <div className="bg-white rounded-xl shadow p-4 mb-4">
-        <p className="text-sm text-gray-500">Status Absensi</p>
-        <p className="text-lg font-bold capitalize">
-          {(absensi?.status || "belum_absen").replace("_", " ")}
-        </p>
-
-        <div className="text-xs text-gray-400 mt-1">
-          {absensi?.jam_masuk && <p>Masuk: {absensi.jam_masuk}</p>}
-          {absensi?.jam_pulang && <p>Pulang: {absensi.jam_pulang}</p>}
-        </div>
-
-        <button
-          onClick={() => navigate("/absensi")}
-          className="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg"
-        >
-          Ke Absensi
-        </button>
-      </div>
-
-      {/* JADWAL HARI INI */}
-      <div className="bg-white rounded-xl shadow p-4 mb-4">
-        <p className="text-sm text-gray-500">Jadwal Hari Ini</p>
-
-        {jadwalHariIni && jadwalHariIni.jam_masuk ? (
-          <div className="text-sm mt-1">
-            <p>⏰ Masuk: <b>{jadwalHariIni.jam_masuk}</b></p>
-            <p>🍽 Istirahat: <b>{jadwalHariIni.istirahat_mulai} - {jadwalHariIni.istirahat_selesai}</b></p>
-            <p>🏁 Pulang: <b>{jadwalHariIni.jam_pulang}</b></p>
-          </div>
-        ) : (
-          <p className="text-sm text-gray-400 mt-1">
-            Libur / Tidak ada jadwal
-          </p>
-        )}
-
-        <button
-          onClick={() => navigate("/jadwal")}
-          className="mt-3 w-full bg-gray-200 text-gray-700 py-2 rounded-lg"
-        >
-          Lihat Jadwal Lengkap
-        </button>
-      </div>
-
-      {/* RINGKASAN GAJI */}
-      <div className="bg-green-600 text-white rounded-xl shadow p-4">
+      {/* ================= GAJI ================= */}
+      <div className="bg-blue-600 text-white rounded-xl p-4 mb-4 shadow">
         <p className="text-sm opacity-80">Gaji Bulan Ini</p>
 
         {gaji ? (
           <>
-            <p className="text-xl font-bold">
+            <p className="text-xl font-bold mt-1">
               Rp {Number(gaji.total_gaji).toLocaleString("id-ID")}
             </p>
             <p className="text-xs opacity-80">
@@ -136,12 +91,101 @@ export default function Dashboard() {
             Data gaji belum tersedia
           </p>
         )}
+      </div>
+
+      {/* ================= TANGGAL ================= */}
+      <div className="bg-white rounded-xl p-3 mb-4 shadow text-center">
+        <p className="text-sm text-gray-600">
+          Hari ini
+        </p>
+        <p className="font-semibold text-gray-800">
+          {tanggalHariIni}
+        </p>
+      </div>
+
+      {/* ================= STATUS ABSENSI ================= */}
+      <div className="bg-white rounded-xl p-4 mb-4 shadow">
+        <p className="text-sm font-semibold mb-3">
+          STATUS ABSENSI
+        </p>
+
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between items-center">
+            <span className="flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                ✓
+              </span>
+              Masuk
+            </span>
+            <span className="font-semibold">
+              {absensi?.jam_masuk || "--:--"}
+            </span>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <span className="flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                →
+              </span>
+              Pulang
+            </span>
+            <span className="font-semibold">
+              {absensi?.jam_pulang || "--:--"}
+            </span>
+          </div>
+        </div>
 
         <button
-          onClick={() => navigate("/gaji")}
-          className="mt-3 w-full bg-white text-green-600 py-2 rounded-lg font-semibold"
+          onClick={() => navigate("/absensi")}
+          className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg font-semibold"
         >
-          Detail Gaji
+          Ke Absensi
+        </button>
+      </div>
+
+      {/* ================= JADWAL ================= */}
+      <div className="bg-white rounded-xl p-4 mb-6 shadow">
+        <p className="text-sm font-semibold mb-3">
+          JADWAL HARI INI
+        </p>
+
+        {jadwalHariIni && jadwalHariIni.jam_masuk ? (
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="flex items-center gap-2">
+                ⏰ Masuk
+              </span>
+              <span>{jadwalHariIni.jam_masuk}</span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="flex items-center gap-2">
+                🍽 Istirahat
+              </span>
+              <span>
+                {jadwalHariIni.istirahat_mulai} -{" "}
+                {jadwalHariIni.istirahat_selesai}
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="flex items-center gap-2">
+                🏁 Pulang
+              </span>
+              <span>{jadwalHariIni.jam_pulang}</span>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-gray-400">
+            Libur / Tidak ada jadwal
+          </p>
+        )}
+
+        <button
+          onClick={() => navigate("/jadwal")}
+          className="mt-4 w-full bg-gray-100 text-gray-700 py-2 rounded-lg font-semibold"
+        >
+          Lihat Jadwal Lengkap
         </button>
       </div>
     </MobileLayout>
