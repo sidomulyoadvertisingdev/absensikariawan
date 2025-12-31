@@ -12,6 +12,7 @@ export default function Absensi() {
   const [pendingAction, setPendingAction] = useState(null);
 
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [cameraReady, setCameraReady] = useState(false);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -19,10 +20,7 @@ export default function Absensi() {
 
   /* ================= JAM REALTIME ================= */
   useEffect(() => {
-    const timer = setInterval(
-      () => setCurrentTime(new Date()),
-      1000
-    );
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -44,19 +42,24 @@ export default function Absensi() {
     return () => stopCamera();
   }, []);
 
-  /* ================= CAMERA ================= */
+  /* ================= CAMERA (DEPAN) ================= */
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
+        video: { facingMode: "user" }, // ✅ kamera depan
         audio: false,
       });
+
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current.play();
+          setCameraReady(true);
+        };
       }
     } catch {
-      setError("Tidak dapat mengakses kamera");
+      setError("Tidak dapat mengakses kamera depan");
     }
   };
 
@@ -71,15 +74,25 @@ export default function Absensi() {
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
+    if (!cameraReady || !video.videoWidth) {
+      throw new Error("Kamera belum siap");
+    }
+
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
     const ctx = canvas.getContext("2d");
     ctx.drawImage(video, 0, 0);
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       canvas.toBlob(
-        (blob) => resolve(blob),
+        (blob) => {
+          if (!blob) {
+            reject("Gagal mengambil foto");
+          } else {
+            resolve(blob);
+          }
+        },
         "image/jpeg",
         0.9
       );
@@ -95,10 +108,7 @@ export default function Absensi() {
     }
 
     if (countdown > 0) {
-      const timer = setTimeout(
-        () => setCountdown(countdown - 1),
-        1000
-      );
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
       return () => clearTimeout(timer);
     }
   }, [countdown, pendingAction]);
@@ -126,11 +136,17 @@ export default function Absensi() {
       formData.append("jam", jam);
       formData.append("foto", fotoBlob, "absen.jpg");
 
-      await api.post("/absensi", formData);
+      await api.post("/absensi", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       await loadStatus();
     } catch (err) {
       setError(
         err.response?.data?.message ||
+          err ||
           "Gagal menyimpan absensi"
       );
     } finally {
@@ -141,31 +157,23 @@ export default function Absensi() {
   if (loading) {
     return (
       <MobileLayout title="Absensi">
-        <p className="text-center text-gray-500">
-          Loading...
-        </p>
+        <p className="text-center text-gray-500">Loading...</p>
       </MobileLayout>
     );
   }
 
-  const tanggalHariIni = currentTime.toLocaleDateString(
-    "id-ID",
-    {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }
-  );
+  const tanggalHariIni = currentTime.toLocaleDateString("id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
-  const jamSekarang = currentTime.toLocaleTimeString(
-    "id-ID",
-    {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }
-  );
+  const jamSekarang = currentTime.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 
   return (
     <MobileLayout title="Absensi">
@@ -177,12 +185,8 @@ export default function Absensi() {
 
       {/* ================= WAKTU ================= */}
       <div className="bg-white rounded-xl p-3 mb-4 shadow text-center">
-        <p className="text-sm text-gray-500">
-          {tanggalHariIni}
-        </p>
-        <p className="text-xl font-bold text-blue-600">
-          {jamSekarang}
-        </p>
+        <p className="text-sm text-gray-500">{tanggalHariIni}</p>
+        <p className="text-xl font-bold text-blue-600">{jamSekarang}</p>
       </div>
 
       {/* ================= CAMERA ================= */}
@@ -191,6 +195,7 @@ export default function Absensi() {
           ref={videoRef}
           autoPlay
           playsInline
+          muted
           className="w-full h-64 object-cover"
         />
         <canvas ref={canvasRef} className="hidden" />
@@ -206,10 +211,7 @@ export default function Absensi() {
 
       {/* ================= STATUS ================= */}
       <div className="bg-white rounded-xl p-4 shadow mb-4">
-        <p className="text-sm font-semibold mb-2">
-          STATUS HARI INI
-        </p>
-
+        <p className="text-sm font-semibold mb-2">STATUS HARI INI</p>
         <div className="text-sm text-gray-600 space-y-1">
           <p>Masuk: {status?.jam_masuk || "--:--"}</p>
           <p>Istirahat: {status?.istirahat_mulai || "--:--"}</p>
@@ -230,18 +232,15 @@ export default function Absensi() {
           </button>
         )}
 
-        {status?.jam_masuk &&
-          !status?.istirahat_mulai && (
-            <button
-              onClick={() =>
-                startCountdown("istirahat_mulai")
-              }
-              disabled={submitting || countdown !== null}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold"
-            >
-              Mulai Istirahat
-            </button>
-          )}
+        {status?.jam_masuk && !status?.istirahat_mulai && (
+          <button
+            onClick={() => startCountdown("istirahat_mulai")}
+            disabled={submitting || countdown !== null}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold"
+          >
+            Mulai Istirahat
+          </button>
+        )}
 
         {status?.istirahat_mulai &&
           !status?.istirahat_selesai && (
