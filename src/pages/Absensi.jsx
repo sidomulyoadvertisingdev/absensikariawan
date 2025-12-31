@@ -13,6 +13,7 @@ export default function Absensi() {
 
   const [currentTime, setCurrentTime] = useState(new Date());
   const [cameraReady, setCameraReady] = useState(false);
+  const [facingMode, setFacingMode] = useState("user"); // ✅ depan / belakang
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -38,17 +39,28 @@ export default function Absensi() {
 
   useEffect(() => {
     loadStatus();
-    startCamera();
+    startCamera(facingMode);
     return () => stopCamera();
   }, []);
 
-  /* ================= CAMERA (DEPAN) ================= */
-  const startCamera = async () => {
+  /* ================= CAMERA ================= */
+  const startCamera = async (mode) => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" }, // ✅ kamera depan
-        audio: false,
-      });
+      stopCamera();
+      setCameraReady(false);
+
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { exact: mode } },
+          audio: false,
+        });
+      } catch {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: mode },
+          audio: false,
+        });
+      }
 
       streamRef.current = stream;
       if (videoRef.current) {
@@ -59,14 +71,22 @@ export default function Absensi() {
         };
       }
     } catch {
-      setError("Tidak dapat mengakses kamera depan");
+      setError("Tidak dapat mengakses kamera");
     }
   };
 
   const stopCamera = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
     }
+  };
+
+  /* ================= SWITCH CAMERA ================= */
+  const switchCamera = () => {
+    const newMode = facingMode === "user" ? "environment" : "user";
+    setFacingMode(newMode);
+    startCamera(newMode);
   };
 
   /* ================= CAPTURE ================= */
@@ -74,7 +94,7 @@ export default function Absensi() {
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
-    if (!cameraReady || !video.videoWidth) {
+    if (!cameraReady || !video || video.videoWidth === 0) {
       throw new Error("Kamera belum siap");
     }
 
@@ -86,13 +106,7 @@ export default function Absensi() {
 
     return new Promise((resolve, reject) => {
       canvas.toBlob(
-        (blob) => {
-          if (!blob) {
-            reject("Gagal mengambil foto");
-          } else {
-            resolve(blob);
-          }
-        },
+        (blob) => (blob ? resolve(blob) : reject("Gagal mengambil foto")),
         "image/jpeg",
         0.9
       );
@@ -136,12 +150,7 @@ export default function Absensi() {
       formData.append("jam", jam);
       formData.append("foto", fotoBlob, "absen.jpg");
 
-      await api.post("/absensi", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
+      await api.post("/absensi", formData);
       await loadStatus();
     } catch (err) {
       setError(
@@ -199,6 +208,15 @@ export default function Absensi() {
           className="w-full h-64 object-cover"
         />
         <canvas ref={canvasRef} className="hidden" />
+
+        {/* SWITCH CAMERA BUTTON */}
+        <button
+          type="button"
+          onClick={switchCamera}
+          className="absolute bottom-3 right-3 bg-black/60 text-white px-3 py-1 rounded text-sm"
+        >
+          {facingMode === "user" ? "Kamera Belakang" : "Kamera Depan"}
+        </button>
 
         {countdown !== null && (
           <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
