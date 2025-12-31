@@ -1,18 +1,58 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 import MobileLayout from "../layout/MobileLayout";
 
 export default function Profile() {
   const navigate = useNavigate();
 
-  // Ambil data user dari localStorage
-  const name = localStorage.getItem("name");
-  const email = localStorage.getItem("email");
-  const role = localStorage.getItem("role");
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
+  /* ================= LOAD USER DARI BACKEND ================= */
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const res = await api.get("/me");
+        setUser(res.data);
+      } catch (err) {
+        setError("Gagal memuat data profil");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, []);
+
+  /* ================= LOGOUT ================= */
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login", { replace: true });
   };
+
+  if (loading) {
+    return (
+      <MobileLayout title="Profile">
+        <p className="text-center text-gray-500">Loading...</p>
+      </MobileLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <MobileLayout title="Profile">
+        <div className="bg-red-100 text-red-600 p-3 rounded text-sm">
+          {error}
+        </div>
+      </MobileLayout>
+    );
+  }
+
+  const name = user?.name || "-";
+  const email = user?.email || "-";
+  const role = user?.role || "user";
 
   const initial =
     name && name.length > 0
@@ -28,15 +68,9 @@ export default function Profile() {
         </div>
 
         <div>
-          <p className="text-sm opacity-80">
-            Login sebagai
-          </p>
-          <p className="font-semibold text-lg">
-            {name || "-"}
-          </p>
-          <p className="text-xs opacity-80">
-            {role || "user"}
-          </p>
+          <p className="text-sm opacity-80">Login sebagai</p>
+          <p className="font-semibold text-lg">{name}</p>
+          <p className="text-xs opacity-80">{role}</p>
         </div>
       </div>
 
@@ -50,21 +84,21 @@ export default function Profile() {
           <div>
             <p className="text-gray-500">Nama</p>
             <p className="font-semibold text-gray-800">
-              {name || "-"}
+              {name}
             </p>
           </div>
 
           <div>
             <p className="text-gray-500">Email</p>
             <p className="font-semibold text-gray-800">
-              {email || "-"}
+              {email}
             </p>
           </div>
 
           <div>
             <p className="text-gray-500">Role</p>
             <p className="font-semibold capitalize text-gray-800">
-              {role || "user"}
+              {role}
             </p>
           </div>
         </div>
