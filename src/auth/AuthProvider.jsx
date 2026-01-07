@@ -1,13 +1,19 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import api from "../api/axios";
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔁 RESTORE USER DARI TOKEN
+  /**
+   * =====================================================
+   * 🔁 AUTO RESTORE USER DARI TOKEN (PENTING)
+   * =====================================================
+   * - Supaya refresh tidak logout
+   * - Supaya websocket aktif
+   */
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -17,7 +23,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     api
-      .get("/me")
+      .get("/me") // ⬅️ endpoint backend auth user
       .then((res) => {
         setUser(res.data);
       })
@@ -25,14 +31,26 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("token");
         setUser(null);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
+  /**
+   * =====================
+   * LOGIN
+   * =====================
+   */
   const login = (userData, token) => {
     localStorage.setItem("token", token);
     setUser(userData);
   };
 
+  /**
+   * =====================
+   * LOGOUT
+   * =====================
+   */
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
@@ -40,9 +58,17 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>
+      {/* ⛔ JANGAN render APP sebelum user direstore */}
       {!loading && children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+/**
+ * =====================
+ * HOOK
+ * =====================
+ */
+export const useAuth = () => {
+  return useContext(AuthContext);
+};

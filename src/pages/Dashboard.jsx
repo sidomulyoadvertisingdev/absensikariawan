@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import MobileLayout from "../layout/MobileLayout";
+import echo from "../lib/echo"; // 🔥 REVERB
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -10,6 +11,10 @@ export default function Dashboard() {
   const [absensi, setAbsensi] = useState(null);
   const [jadwalHariIni, setJadwalHariIni] = useState(null);
   const [gaji, setGaji] = useState(null);
+
+  // 🔥 JOB TODO
+  const [jobTodos, setJobTodos] = useState([]);
+  const [jobTotal, setJobTotal] = useState(0);
 
   const hariMap = {
     1: "senin",
@@ -21,16 +26,27 @@ export default function Dashboard() {
     0: "minggu",
   };
 
+  /**
+   * ===============================
+   * LOAD DASHBOARD DATA
+   * ===============================
+   */
   useEffect(() => {
     const loadDashboard = async () => {
       try {
         const today = new Date();
         const hari = hariMap[today.getDay()];
 
-        const [absenRes, jadwalRes, gajiRes] = await Promise.all([
+        const [
+          absenRes,
+          jadwalRes,
+          gajiRes,
+          jobRes,
+        ] = await Promise.all([
           api.get("/absensi/today"),
           api.get("/jadwal"),
           api.get("/gaji"),
+          api.get("/job-todos/my"),
         ]);
 
         setAbsensi(absenRes.data);
@@ -41,6 +57,9 @@ export default function Dashboard() {
         setJadwalHariIni(jadwalToday);
 
         setGaji(gajiRes.data.data);
+
+        setJobTodos(jobRes.data.data || []);
+        setJobTotal((jobRes.data.data || []).length);
       } catch (err) {
         console.error(err);
       } finally {
@@ -49,6 +68,38 @@ export default function Dashboard() {
     };
 
     loadDashboard();
+  }, []);
+
+  /**
+   * ===============================
+   * 🔥 REALTIME JOB TODO (REVERB)
+   * ===============================
+   */
+  useEffect(() => {
+    echo
+      .private("job-todos")
+      .listen(".JobTodoCreated", (e) => {
+        console.log("📢 Job Todo Baru:", e);
+
+        // 🔥 Tambahkan realtime ke dashboard
+        setJobTodos((prev) => [
+          {
+            id: e.id,
+            title: e.title,
+            status: "pending",
+          },
+          ...prev,
+        ]);
+
+        setJobTotal((prev) => prev + 1);
+
+        // 🔔 Notifikasi sementara
+        alert(`📌 Job Baru!\n${e.title}\nBonus: Rp ${e.bonus}`);
+      });
+
+    return () => {
+      echo.leave("job-todos");
+    };
   }, []);
 
   const tanggalHariIni = new Date().toLocaleDateString("id-ID", {
@@ -63,7 +114,7 @@ export default function Dashboard() {
       <MobileLayout title="Dashboard">
         <div className="space-y-4 animate-pulse">
           <div className="h-24 bg-gray-200 rounded-xl" />
-          <div className="h-14 bg-gray-200 rounded-xl" />
+          <div className="h-20 bg-gray-200 rounded-xl" />
           <div className="h-32 bg-gray-200 rounded-xl" />
           <div className="h-40 bg-gray-200 rounded-xl" />
         </div>
@@ -90,6 +141,75 @@ export default function Dashboard() {
           <p className="text-sm opacity-80">
             Data gaji belum tersedia
           </p>
+        )}
+      </div>
+
+      {/* ================= MENU CEPAT JOB TODO ================= */}
+      <div className="bg-white rounded-xl p-4 mb-4 shadow">
+        <p className="text-sm font-semibold mb-3">
+          JOB TODO
+        </p>
+
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => navigate("/job-todo")}
+            className="bg-indigo-600 text-white rounded-lg p-4 text-left"
+          >
+            <p className="text-lg font-bold">{jobTotal}</p>
+            <p className="text-sm opacity-80">
+              Job Saya
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/job-todo/available")}
+            className="bg-emerald-600 text-white rounded-lg p-4 text-left"
+          >
+            <p className="text-lg font-bold">+</p>
+            <p className="text-sm opacity-80">
+              Job Tersedia
+            </p>
+          </button>
+        </div>
+      </div>
+
+      {/* ================= JOB TODO AKTIF ================= */}
+      <div className="bg-white rounded-xl p-4 mb-4 shadow">
+        <p className="text-sm font-semibold mb-3">
+          JOB TODO AKTIF
+        </p>
+
+        {jobTodos.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center">
+            Tidak ada job aktif 🎉
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {jobTodos.map((job) => (
+              <div
+                key={job.id}
+                className="border rounded-lg p-3 flex justify-between items-center"
+              >
+                <div>
+                  <p className="font-semibold text-sm">
+                    {job.title}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Status: {job.status}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() =>
+                    navigate(`/job-todo/${job.id}`)
+                  }
+                  className="text-indigo-600 text-sm font-semibold"
+                >
+                  Kerjakan →
+                </button>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
@@ -152,16 +272,12 @@ export default function Dashboard() {
         {jadwalHariIni && jadwalHariIni.jam_masuk ? (
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="flex items-center gap-2">
-                ⏰ Masuk
-              </span>
+              <span>⏰ Masuk</span>
               <span>{jadwalHariIni.jam_masuk}</span>
             </div>
 
             <div className="flex justify-between">
-              <span className="flex items-center gap-2">
-                🍽 Istirahat
-              </span>
+              <span>🍽 Istirahat</span>
               <span>
                 {jadwalHariIni.istirahat_mulai} -{" "}
                 {jadwalHariIni.istirahat_selesai}
@@ -169,9 +285,7 @@ export default function Dashboard() {
             </div>
 
             <div className="flex justify-between">
-              <span className="flex items-center gap-2">
-                🏁 Pulang
-              </span>
+              <span>🏁 Pulang</span>
               <span>{jadwalHariIni.jam_pulang}</span>
             </div>
           </div>

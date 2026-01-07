@@ -5,6 +5,12 @@ import {
   Navigate,
 } from "react-router-dom";
 
+import { Toaster } from "sonner";
+
+/* ================= AUTH ================= */
+import RequireAuth from "./auth/RequireAuth";
+
+/* ================= PAGES ================= */
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Absensi from "./pages/Absensi";
@@ -13,11 +19,23 @@ import Gaji from "./pages/Gaji";
 import Lembur from "./pages/Lembur";
 import Profile from "./pages/Profile";
 
-import RequireAuth from "./auth/RequireAuth";
+/* 🔥 JOB TODO */
+import JobTodo from "./pages/JobTodo";
+import JobTodoAvailable from "./pages/JobTodoAvailable";
+import JobTodoDetail from "./pages/JobTodoDetail";
 
 export default function App() {
   return (
     <BrowserRouter>
+
+      {/* 🔔 GLOBAL TOAST */}
+      <Toaster
+        position="top-center"
+        richColors
+        closeButton
+        duration={4000}
+      />
+
       <Routes>
         {/* ROOT */}
         <Route path="/" element={<Navigate to="/login" replace />} />
@@ -25,7 +43,8 @@ export default function App() {
         {/* LOGIN */}
         <Route path="/login" element={<Login />} />
 
-        {/* PROTECTED */}
+        {/* ================= PROTECTED ROUTES ================= */}
+
         <Route
           path="/dashboard"
           element={
@@ -76,6 +95,46 @@ export default function App() {
           element={
             <RequireAuth>
               <Profile />
+            </RequireAuth>
+          }
+        />
+
+        {/* ================= JOB TODO ================= */}
+
+        {/* JOB SAYA
+           - Direct job
+           - Broadcast yang sudah diambil
+        */}
+        <Route
+          path="/job-todo"
+          element={
+            <RequireAuth>
+              <JobTodo />
+            </RequireAuth>
+          }
+        />
+
+        {/* JOB TERSEDIA
+           - Broadcast job
+        */}
+        <Route
+          path="/job-todo/available"
+          element={
+            <RequireAuth>
+              <JobTodoAvailable />
+            </RequireAuth>
+          }
+        />
+
+        {/* DETAIL JOB
+           - Auto accept
+           - Selesaikan job
+        */}
+        <Route
+          path="/job-todo/:id"
+          element={
+            <RequireAuth>
+              <JobTodoDetail />
             </RequireAuth>
           }
         />
