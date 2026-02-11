@@ -9,7 +9,7 @@ import {
   LogOut,
 } from "lucide-react";
 import api from "../api/axios";
-import MobileLayout from "../layout/MobileLayout";
+import MobileLayout from "../layout/MobileLayout.jsx";
 import echo from "../lib/echo";
 
 export default function Dashboard() {

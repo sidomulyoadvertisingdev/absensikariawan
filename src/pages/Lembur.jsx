@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import api from "../api/axios";
-import MobileLayout from "../layout/MobileLayout";
+import MobileLayout from "../layout/MobileLayout.jsx";
 
 export default function Lembur() {
   const [list, setList] = useState([]);

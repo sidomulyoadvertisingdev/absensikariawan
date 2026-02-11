@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import api from "../api/axios";
-import MobileLayout from "../layout/MobileLayout";
+import MobileLayout from "../layout/MobileLayout.jsx";
 
 export default function Absensi() {
   const [status, setStatus] = useState(null);

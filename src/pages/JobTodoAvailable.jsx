@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
-import MobileLayout from "../layout/MobileLayout";
+import MobileLayout from "../layout/MobileLayout.jsx";
 
 export default function JobTodoAvailable() {
   const [jobs, setJobs] = useState([]);
