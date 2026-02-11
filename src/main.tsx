@@ -4,7 +4,7 @@ import App from "./App";
 import "./index.css";
 
 /* 🔐 AUTH PROVIDER */
-import { AuthProvider } from "./auth/AuthProvider";
+import { AuthProvider } from "./auth/AuthProvider.jsx";
 
 ReactDOM.createRoot(
   document.getElementById("root")!

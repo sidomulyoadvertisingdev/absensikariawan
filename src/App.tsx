@@ -8,20 +8,20 @@ import {
 import { Toaster } from "sonner";
 
 /* ================= AUTH ================= */
-import RequireAuth from "./auth/RequireAuth";
+import RequireAuth from "./auth/RequireAuth.jsx";
 
 /* ================= PAGES ================= */
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Absensi from "./pages/Absensi";
-import Jadwal from "./pages/Jadwal";
-import Gaji from "./pages/Gaji";
-import Lembur from "./pages/Lembur";
-import Profile from "./pages/Profile";
+import Login from "./pages/Login.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Absensi from "./pages/Absensi.jsx";
+import Jadwal from "./pages/Jadwal.jsx";
+import Gaji from "./pages/Gaji.jsx";
+import Lembur from "./pages/Lembur.jsx";
+import Profile from "./pages/Profile.jsx";
 
 /* 🔥 JOB TODO */
 import JobTodo from "./pages/JobTodo";
-import JobTodoAvailable from "./pages/JobTodoAvailable";
+import JobTodoAvailable from "./pages/JobTodoAvailable.jsx";
 import JobTodoDetail from "./pages/JobTodoDetail";
 
 export default function App() {
