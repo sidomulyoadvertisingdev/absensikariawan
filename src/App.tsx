@@ -20,9 +20,9 @@ import Lembur from "./pages/Lembur.jsx";
 import Profile from "./pages/Profile.jsx";
 
 /* 🔥 JOB TODO */
-import JobTodo from "./pages/JobTodo";
+import JobTodo from "./pages/JobTodo.tsx";
 import JobTodoAvailable from "./pages/JobTodoAvailable.jsx";
-import JobTodoDetail from "./pages/JobTodoDetail";
+import JobTodoDetail from "./pages/JobTodoDetail.tsx";
 
 export default function App() {
   return (
