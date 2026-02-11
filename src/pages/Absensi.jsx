@@ -18,6 +18,12 @@ export default function Absensi() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const fotoWajib = new Set([
+    "masuk",
+    "istirahat_mulai",
+    "istirahat_selesai",
+    "pulang",
+  ]);
 
   /* ================= JAM REALTIME ================= */
   useEffect(() => {
@@ -121,7 +127,7 @@ export default function Absensi() {
       setPendingAction(null);
     }
 
-    if (countdown > 0) {
+    if (countdown !== null && countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
       return () => clearTimeout(timer);
     }
@@ -129,7 +135,20 @@ export default function Absensi() {
 
   const startCountdown = (aksi) => {
     setPendingAction(aksi);
-    setCountdown(10);
+    setCountdown(3);
+  };
+
+  const handleAction = (aksi) => {
+    if (fotoWajib.has(aksi)) {
+      if (!cameraReady) {
+        setError("Kamera belum siap");
+        return;
+      }
+      startCountdown(aksi);
+      return;
+    }
+
+    absen(aksi);
   };
 
   /* ================= SUBMIT ABSEN ================= */
@@ -143,12 +162,14 @@ export default function Absensi() {
         minute: "2-digit",
       });
 
-      const fotoBlob = await capturePhoto();
-
       const formData = new FormData();
       formData.append("aksi", aksi);
       formData.append("jam", jam);
-      formData.append("foto", fotoBlob, "absen.jpg");
+
+      if (fotoWajib.has(aksi)) {
+        const fotoBlob = await capturePhoto();
+        formData.append("foto", fotoBlob, "absen.jpg");
+      }
 
       await api.post("/absensi", formData);
       await loadStatus();
@@ -242,7 +263,7 @@ export default function Absensi() {
       <div className="space-y-3">
         {!status?.jam_masuk && (
           <button
-            onClick={() => startCountdown("masuk")}
+            onClick={() => handleAction("masuk")}
             disabled={submitting || countdown !== null}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold"
           >
@@ -252,20 +273,18 @@ export default function Absensi() {
 
         {status?.jam_masuk && !status?.istirahat_mulai && (
           <button
-            onClick={() => startCountdown("istirahat_mulai")}
+            onClick={() => handleAction("istirahat_mulai")}
             disabled={submitting || countdown !== null}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold"
           >
-            Mulai Istirahat
+            Mulai Istirahat (Foto Otomatis)
           </button>
         )}
 
         {status?.istirahat_mulai &&
           !status?.istirahat_selesai && (
             <button
-              onClick={() =>
-                startCountdown("istirahat_selesai")
-              }
+              onClick={() => handleAction("istirahat_selesai")}
               disabled={submitting || countdown !== null}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold"
             >
@@ -276,7 +295,7 @@ export default function Absensi() {
         {status?.istirahat_selesai &&
           !status?.jam_pulang && (
             <button
-              onClick={() => startCountdown("pulang")}
+              onClick={() => handleAction("pulang")}
               disabled={submitting || countdown !== null}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold"
             >

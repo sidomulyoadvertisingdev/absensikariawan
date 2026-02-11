@@ -18,22 +18,57 @@ export default function Login() {
 
     try {
       /**
-       * 🔑 PENTING
-       * Backend Laravel VALIDASI PAKAI `email`
-       * UI tetap boleh tulis "Username"
+       * 🔑 BACKEND LARAVEL
+       * Validasi pakai `email`
+       * UI boleh tulis Username / Email
        */
       const res = await api.post("/login", {
-        email: username,     // ✅ INI KUNCI (bukan username)
+        email: username.trim(),
         password: password,
       });
 
-      localStorage.setItem("token", res.data.token);
-      navigate("/dashboard");
+      /**
+       * 🔐 VALIDASI RESPONSE
+       */
+      const token = res?.data?.token;
+
+      if (!token) {
+        throw new Error("Token tidak diterima dari server");
+      }
+
+      /**
+       * 💾 SIMPAN TOKEN (WAJIB UNTUK WEB)
+       * Dipakai oleh axios interceptor
+       */
+      localStorage.setItem("token", token);
+
+      /**
+       * 🔁 Optional: simpan user info kalau ada
+       */
+      if (res.data.user) {
+        localStorage.setItem(
+          "user",
+          JSON.stringify(res.data.user)
+        );
+      }
+
+      /**
+       * 🚀 NAVIGATE SETELAH TOKEN TERSIMPAN
+       */
+      navigate("/dashboard", { replace: true });
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Username atau password salah"
-      );
+      console.error("LOGIN ERROR:", err);
+
+      if (err.response) {
+        // 🔴 Error dari backend
+        setError(
+          err.response.data?.message ||
+            "Username atau password salah"
+        );
+      } else {
+        // 🔴 Error jaringan / kode
+        setError(err.message || "Terjadi kesalahan");
+      }
     } finally {
       setLoading(false);
     }
@@ -43,12 +78,10 @@ export default function Login() {
     <div className="min-h-screen bg-[#0f2f4f] flex justify-center">
       <div className="w-full max-w-[430px] relative">
 
-        {/* ===== BACKGROUND IMAGE (ATAS SAJA) ===== */}
+        {/* ===== BACKGROUND IMAGE ===== */}
         <div
           className="h-56 w-full bg-cover bg-center"
-          style={{
-            backgroundImage: "url('/login-bg.jpg')",
-          }}
+          style={{ backgroundImage: "url('/login-bg.jpg')" }}
         >
           <div className="w-full h-full bg-black/30" />
         </div>
@@ -57,7 +90,6 @@ export default function Login() {
         <div className="-mt-20 px-6">
           <div className="bg-[#143d63] rounded-3xl p-6 shadow-xl">
 
-            {/* TITLE */}
             <h1 className="text-white text-2xl font-bold text-center">
               Welcome Back
             </h1>
@@ -75,7 +107,7 @@ export default function Login() {
             {/* FORM */}
             <form onSubmit={submit} className="mt-6 space-y-4">
 
-              {/* USERNAME / EMAIL */}
+              {/* USERNAME */}
               <div>
                 <label className="text-sm text-gray-300">
                   Username / Email
@@ -85,6 +117,7 @@ export default function Login() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
+                  autoComplete="username"
                   className="mt-1 w-full rounded-lg bg-gray-100 px-3 py-2 outline-none"
                 />
               </div>
@@ -100,6 +133,7 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    autoComplete="current-password"
                     className="mt-1 w-full rounded-lg bg-gray-100 px-3 py-2 outline-none pr-10"
                   />
                   <button
@@ -115,7 +149,7 @@ export default function Login() {
               {/* REMEMBER */}
               <div className="flex justify-between items-center text-sm text-gray-300">
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" />
+                  <input type="checkbox" disabled />
                   Remember me
                 </label>
                 <span className="text-gray-200">

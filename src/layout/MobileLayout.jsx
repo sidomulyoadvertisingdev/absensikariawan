@@ -10,9 +10,7 @@ export default function MobileLayout({ title, children }) {
         <Header title={title} />
 
         {/* Content */}
-        <main className="pt-16 pb-20 px-4">
-          {children}
-        </main>
+        <main className="pt-16 pb-20 px-4">{children}</main>
 
         {/* Bottom Nav */}
         <BottomNav />
