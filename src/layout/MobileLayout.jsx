@@ -1,5 +1,5 @@
-import Header from "../components/Header";
-import BottomNav from "../components/BottomNav";
+import Header from "../components/Header.jsx";
+import BottomNav from "../components/BottomNav.jsx";
 
 export default function MobileLayout({ title, children }) {
   return (
