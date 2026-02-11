@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  Coffee,
+  Flag,
+  LogOut,
+} from "lucide-react";
 import api from "../api/axios";
 import MobileLayout from "../layout/MobileLayout";
-import echo from "../lib/echo"; // 🔥 REVERB
+import echo from "../lib/echo";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -12,7 +20,6 @@ export default function Dashboard() {
   const [jadwalHariIni, setJadwalHariIni] = useState(null);
   const [gaji, setGaji] = useState(null);
 
-  // 🔥 JOB TODO
   const [jobTodos, setJobTodos] = useState([]);
   const [jobTotal, setJobTotal] = useState(0);
 
@@ -24,6 +31,13 @@ export default function Dashboard() {
     5: "jumat",
     6: "sabtu",
     0: "minggu",
+  };
+
+  const formatYMD = (date) => {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, "0");
+    const day = `${date.getDate()}`.padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
   /**
@@ -51,9 +65,36 @@ export default function Dashboard() {
 
         setAbsensi(absenRes.data);
 
-        const jadwalToday = jadwalRes.data.data.find(
-          (j) => j.hari === hari
-        );
+        const jadwalPayload = jadwalRes.data;
+        const jadwalData = Array.isArray(jadwalPayload)
+          ? jadwalPayload
+          : jadwalPayload?.data || [];
+        const jadwalMode = Array.isArray(jadwalPayload)
+          ? "per_hari"
+          : jadwalPayload?.mode || "per_hari";
+
+        let jadwalToday = null;
+        if (jadwalMode === "per_tanggal") {
+          const todayStr = formatYMD(today);
+          const found = jadwalData.find(
+            (j) => j.tanggal === todayStr
+          );
+
+          jadwalToday =
+            found && found.aktif === false
+              ? {
+                  ...found,
+                  jam_masuk: null,
+                  jam_pulang: null,
+                  istirahat_mulai: null,
+                  istirahat_selesai: null,
+                }
+              : found;
+        } else {
+          jadwalToday = jadwalData.find(
+            (j) => j.hari === hari
+          );
+        }
         setJadwalHariIni(jadwalToday);
 
         setGaji(gajiRes.data.data);
@@ -72,16 +113,15 @@ export default function Dashboard() {
 
   /**
    * ===============================
-   * 🔥 REALTIME JOB TODO (REVERB)
+   * REALTIME JOB TODO (REVERB)
    * ===============================
    */
   useEffect(() => {
     echo
       .private("job-todos")
       .listen(".JobTodoCreated", (e) => {
-        console.log("📢 Job Todo Baru:", e);
+        console.log("Job Todo Baru:", e);
 
-        // 🔥 Tambahkan realtime ke dashboard
         setJobTodos((prev) => [
           {
             id: e.id,
@@ -92,9 +132,7 @@ export default function Dashboard() {
         ]);
 
         setJobTotal((prev) => prev + 1);
-
-        // 🔔 Notifikasi sementara
-        alert(`📌 Job Baru!\n${e.title}\nBonus: Rp ${e.bonus}`);
+        alert(`Job Baru!\n${e.title}\nBonus: Rp ${e.bonus}`);
       });
 
     return () => {
@@ -125,7 +163,7 @@ export default function Dashboard() {
   return (
     <MobileLayout title="Dashboard">
       {/* ================= GAJI ================= */}
-      <div className="bg-blue-600 text-white rounded-xl p-4 mb-4 shadow">
+      <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 text-white rounded-2xl p-4 mb-4 shadow-lg shadow-blue-200/60">
         <p className="text-sm opacity-80">Gaji Bulan Ini</p>
 
         {gaji ? (
@@ -145,7 +183,7 @@ export default function Dashboard() {
       </div>
 
       {/* ================= MENU CEPAT JOB TODO ================= */}
-      <div className="bg-white rounded-xl p-4 mb-4 shadow">
+      <div className="app-card app-card-hover p-4 mb-4">
         <p className="text-sm font-semibold mb-3">
           JOB TODO
         </p>
@@ -153,7 +191,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => navigate("/job-todo")}
-            className="bg-indigo-600 text-white rounded-lg p-4 text-left"
+            className="bg-indigo-600 text-white rounded-2xl p-4 text-left shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
           >
             <p className="text-lg font-bold">{jobTotal}</p>
             <p className="text-sm opacity-80">
@@ -163,7 +201,7 @@ export default function Dashboard() {
 
           <button
             onClick={() => navigate("/job-todo/available")}
-            className="bg-emerald-600 text-white rounded-lg p-4 text-left"
+            className="bg-emerald-600 text-white rounded-2xl p-4 text-left shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
           >
             <p className="text-lg font-bold">+</p>
             <p className="text-sm opacity-80">
@@ -174,21 +212,21 @@ export default function Dashboard() {
       </div>
 
       {/* ================= JOB TODO AKTIF ================= */}
-      <div className="bg-white rounded-xl p-4 mb-4 shadow">
+      <div className="app-card app-card-hover p-4 mb-4">
         <p className="text-sm font-semibold mb-3">
           JOB TODO AKTIF
         </p>
 
         {jobTodos.length === 0 ? (
           <p className="text-sm text-gray-400 text-center">
-            Tidak ada job aktif 🎉
+            Tidak ada job aktif
           </p>
         ) : (
           <div className="space-y-3">
             {jobTodos.map((job) => (
               <div
                 key={job.id}
-                className="border rounded-lg p-3 flex justify-between items-center"
+                className="border border-slate-200/70 rounded-xl p-3 flex justify-between items-center bg-white/70 transition hover:bg-white"
               >
                 <div>
                   <p className="font-semibold text-sm">
@@ -203,9 +241,10 @@ export default function Dashboard() {
                   onClick={() =>
                     navigate(`/job-todo/${job.id}`)
                   }
-                  className="text-indigo-600 text-sm font-semibold"
+                  className="inline-flex items-center gap-1 text-indigo-600 text-sm font-semibold hover:text-indigo-700"
                 >
-                  Kerjakan →
+                  Kerjakan
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             ))}
@@ -214,7 +253,7 @@ export default function Dashboard() {
       </div>
 
       {/* ================= TANGGAL ================= */}
-      <div className="bg-white rounded-xl p-3 mb-4 shadow text-center">
+      <div className="app-card app-card-hover p-3 mb-4 text-center">
         <p className="text-sm text-gray-600">
           Hari ini
         </p>
@@ -224,7 +263,7 @@ export default function Dashboard() {
       </div>
 
       {/* ================= STATUS ABSENSI ================= */}
-      <div className="bg-white rounded-xl p-4 mb-4 shadow">
+      <div className="app-card app-card-hover p-4 mb-4">
         <p className="text-sm font-semibold mb-3">
           STATUS ABSENSI
         </p>
@@ -232,8 +271,8 @@ export default function Dashboard() {
         <div className="space-y-2 text-sm">
           <div className="flex justify-between items-center">
             <span className="flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
-                ✓
+              <span className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4" />
               </span>
               Masuk
             </span>
@@ -244,8 +283,8 @@ export default function Dashboard() {
 
           <div className="flex justify-between items-center">
             <span className="flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
-                →
+              <span className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                <LogOut className="w-4 h-4" />
               </span>
               Pulang
             </span>
@@ -257,14 +296,14 @@ export default function Dashboard() {
 
         <button
           onClick={() => navigate("/absensi")}
-          className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg font-semibold"
+          className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg font-semibold transition hover:bg-blue-700"
         >
           Ke Absensi
         </button>
       </div>
 
       {/* ================= JADWAL ================= */}
-      <div className="bg-white rounded-xl p-4 mb-6 shadow">
+      <div className="app-card app-card-hover p-4 mb-6">
         <p className="text-sm font-semibold mb-3">
           JADWAL HARI INI
         </p>
@@ -272,12 +311,18 @@ export default function Dashboard() {
         {jadwalHariIni && jadwalHariIni.jam_masuk ? (
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span>⏰ Masuk</span>
+              <span className="flex items-center gap-2 text-slate-600">
+                <Clock className="w-4 h-4 text-slate-500" />
+                Masuk
+              </span>
               <span>{jadwalHariIni.jam_masuk}</span>
             </div>
 
             <div className="flex justify-between">
-              <span>🍽 Istirahat</span>
+              <span className="flex items-center gap-2 text-slate-600">
+                <Coffee className="w-4 h-4 text-slate-500" />
+                Istirahat
+              </span>
               <span>
                 {jadwalHariIni.istirahat_mulai} -{" "}
                 {jadwalHariIni.istirahat_selesai}
@@ -285,7 +330,10 @@ export default function Dashboard() {
             </div>
 
             <div className="flex justify-between">
-              <span>🏁 Pulang</span>
+              <span className="flex items-center gap-2 text-slate-600">
+                <Flag className="w-4 h-4 text-slate-500" />
+                Pulang
+              </span>
               <span>{jadwalHariIni.jam_pulang}</span>
             </div>
           </div>
@@ -297,7 +345,7 @@ export default function Dashboard() {
 
         <button
           onClick={() => navigate("/jadwal")}
-          className="mt-4 w-full bg-gray-100 text-gray-700 py-2 rounded-lg font-semibold"
+          className="mt-4 w-full bg-slate-100 text-slate-700 py-2 rounded-lg font-semibold transition hover:bg-slate-200"
         >
           Lihat Jadwal Lengkap
         </button>

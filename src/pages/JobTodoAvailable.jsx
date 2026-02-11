@@ -17,7 +17,7 @@ export default function JobTodoAvailable() {
 
   return (
     <MobileLayout title="Job Tersedia">
-      <div className="bg-white rounded-xl p-4 shadow">
+      <div className="app-card app-card-hover p-4">
         <p className="text-sm font-semibold mb-3">
           BROADCAST JOB
         </p>
@@ -31,7 +31,7 @@ export default function JobTodoAvailable() {
             {jobs.map((job) => (
               <div
                 key={job.id}
-                className="border rounded-lg p-3 flex justify-between items-center"
+                className="border border-slate-200/70 rounded-xl p-3 flex justify-between items-center bg-white/70 transition hover:bg-white"
               >
                 <div>
                   <p className="font-semibold text-sm">
@@ -44,7 +44,7 @@ export default function JobTodoAvailable() {
 
                 <button
                   onClick={() => ambilJob(job.id)}
-                  className="bg-emerald-600 text-white px-3 py-1 rounded text-sm"
+                  className="bg-emerald-600 text-white px-3 py-1 rounded-lg text-sm font-semibold transition hover:bg-emerald-700"
                 >
                   Ambil
                 </button>

@@ -59,13 +59,13 @@ export default function Gaji() {
   return (
     <MobileLayout title="Gaji">
       {/* BULAN */}
-      <div className="bg-white rounded-xl shadow p-4 mb-4 text-center">
+      <div className="app-card app-card-hover p-4 mb-4 text-center">
         <p className="text-sm text-gray-500">Periode</p>
         <p className="text-lg font-bold">{gaji.bulan}</p>
       </div>
 
       {/* DETAIL GAJI */}
-      <div className="bg-white rounded-xl shadow p-4 space-y-3 mb-4">
+      <div className="app-card app-card-hover p-4 space-y-3 mb-4">
         <Row label="Gaji Pokok">
           Rp {Number(gaji.gaji_pokok).toLocaleString("id-ID")}
         </Row>
@@ -84,7 +84,7 @@ export default function Gaji() {
       </div>
 
       {/* LEMBUR */}
-      <div className="bg-white rounded-xl shadow p-4 space-y-3 mb-4">
+      <div className="app-card app-card-hover p-4 space-y-3 mb-4">
         <Row label="Total Jam Lembur">
           {gaji.total_jam_lembur} jam
         </Row>
@@ -95,7 +95,7 @@ export default function Gaji() {
       </div>
 
       {/* TOTAL GAJI */}
-      <div className="bg-green-600 text-white rounded-xl shadow p-4 flex justify-between items-center">
+      <div className="bg-gradient-to-br from-emerald-600 to-lime-500 text-white rounded-2xl shadow-lg shadow-emerald-200/60 p-4 flex justify-between items-center">
         <span className="font-semibold text-lg">Total Gaji</span>
         <span className="font-bold text-xl">
           Rp {Number(gaji.total_gaji).toLocaleString("id-ID")}

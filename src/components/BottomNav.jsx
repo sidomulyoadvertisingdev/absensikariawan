@@ -1,54 +1,85 @@
 import { NavLink } from "react-router-dom";
 import {
-  HiOutlineHome,
-  HiOutlineClock,
-  HiOutlineCalendar,
-  HiOutlineCash,
-  HiOutlineUser,
-} from "react-icons/hi";
+  Home,
+  Clock,
+  CalendarDays,
+  Wallet,
+  User2,
+} from "lucide-react";
+
+const navItemBase =
+  "group flex flex-col items-center gap-1 text-[11px] font-medium transition";
 
 export default function BottomNav() {
-  const linkClass = ({ isActive }) =>
-    `flex flex-col items-center text-xs transition ${
-      isActive
-        ? "text-blue-600 font-semibold"
-        : "text-gray-400"
+  const itemClass = ({ isActive }) =>
+    `${navItemBase} ${
+      isActive ? "text-slate-900" : "text-slate-500"
     }`;
 
-  return (
-    <nav className="fixed bottom-0 w-full max-w-[430px] bg-white border-t z-20">
-      <div className="h-16 flex justify-around items-center">
+  const renderIcon = (Icon, isActive) => (
+    <span
+      className={`grid place-items-center w-10 h-10 rounded-xl transition ${
+        isActive
+          ? "bg-blue-600 text-white shadow-md shadow-blue-200/60"
+          : "bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700"
+      }`}
+    >
+      <Icon size={20} />
+    </span>
+  );
 
+  return (
+    <nav className="fixed bottom-3 w-full max-w-[430px] px-4 z-20">
+      <div className="h-16 bg-white/85 backdrop-blur-xl border border-slate-200/70 rounded-2xl shadow-lg shadow-slate-200/60 flex justify-around items-center">
         {/* ===== DASHBOARD ===== */}
-        <NavLink to="/dashboard" className={linkClass}>
-          <HiOutlineHome size={22} />
-          <span className="text-[11px] mt-0.5">Home</span>
+        <NavLink to="/dashboard" className={itemClass}>
+          {({ isActive }) => (
+            <>
+              {renderIcon(Home, isActive)}
+              <span>Home</span>
+            </>
+          )}
         </NavLink>
 
         {/* ===== ABSENSI ===== */}
-        <NavLink to="/absensi" className={linkClass}>
-          <HiOutlineClock size={22} />
-          <span className="text-[11px] mt-0.5">Absensi</span>
+        <NavLink to="/absensi" className={itemClass}>
+          {({ isActive }) => (
+            <>
+              {renderIcon(Clock, isActive)}
+              <span>Absensi</span>
+            </>
+          )}
         </NavLink>
 
         {/* ===== JADWAL ===== */}
-        <NavLink to="/jadwal" className={linkClass}>
-          <HiOutlineCalendar size={22} />
-          <span className="text-[11px] mt-0.5">Jadwal</span>
+        <NavLink to="/jadwal" className={itemClass}>
+          {({ isActive }) => (
+            <>
+              {renderIcon(CalendarDays, isActive)}
+              <span>Jadwal</span>
+            </>
+          )}
         </NavLink>
 
         {/* ===== GAJI ===== */}
-        <NavLink to="/gaji" className={linkClass}>
-          <HiOutlineCash size={22} />
-          <span className="text-[11px] mt-0.5">Gaji</span>
+        <NavLink to="/gaji" className={itemClass}>
+          {({ isActive }) => (
+            <>
+              {renderIcon(Wallet, isActive)}
+              <span>Gaji</span>
+            </>
+          )}
         </NavLink>
 
         {/* ===== PROFILE ===== */}
-        <NavLink to="/profile" className={linkClass}>
-          <HiOutlineUser size={22} />
-          <span className="text-[11px] mt-0.5">Profil</span>
+        <NavLink to="/profile" className={itemClass}>
+          {({ isActive }) => (
+            <>
+              {renderIcon(User2, isActive)}
+              <span>Profil</span>
+            </>
+          )}
         </NavLink>
-
       </div>
     </nav>
   );

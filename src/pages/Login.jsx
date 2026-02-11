@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import api from "../api/axios";
 
 export default function Login() {
@@ -18,7 +19,7 @@ export default function Login() {
 
     try {
       /**
-       * 🔑 BACKEND LARAVEL
+       * BACKEND LARAVEL
        * Validasi pakai `email`
        * UI boleh tulis Username / Email
        */
@@ -28,7 +29,7 @@ export default function Login() {
       });
 
       /**
-       * 🔐 VALIDASI RESPONSE
+       * VALIDASI RESPONSE
        */
       const token = res?.data?.token;
 
@@ -37,13 +38,13 @@ export default function Login() {
       }
 
       /**
-       * 💾 SIMPAN TOKEN (WAJIB UNTUK WEB)
+       * SIMPAN TOKEN (WAJIB UNTUK WEB)
        * Dipakai oleh axios interceptor
        */
       localStorage.setItem("token", token);
 
       /**
-       * 🔁 Optional: simpan user info kalau ada
+       * Optional: simpan user info kalau ada
        */
       if (res.data.user) {
         localStorage.setItem(
@@ -53,20 +54,20 @@ export default function Login() {
       }
 
       /**
-       * 🚀 NAVIGATE SETELAH TOKEN TERSIMPAN
+       * NAVIGATE SETELAH TOKEN TERSIMPAN
        */
       navigate("/dashboard", { replace: true });
     } catch (err) {
       console.error("LOGIN ERROR:", err);
 
       if (err.response) {
-        // 🔴 Error dari backend
+        // Error dari backend
         setError(
           err.response.data?.message ||
             "Username atau password salah"
         );
       } else {
-        // 🔴 Error jaringan / kode
+        // Error jaringan / kode
         setError(err.message || "Terjadi kesalahan");
       }
     } finally {
@@ -75,21 +76,19 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f2f4f] flex justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-900 to-blue-900 flex justify-center">
       <div className="w-full max-w-[430px] relative">
-
         {/* ===== BACKGROUND IMAGE ===== */}
         <div
           className="h-56 w-full bg-cover bg-center"
           style={{ backgroundImage: "url('/login-bg.jpg')" }}
         >
-          <div className="w-full h-full bg-black/30" />
+          <div className="w-full h-full bg-gradient-to-b from-slate-900/40 to-slate-900/80" />
         </div>
 
         {/* ===== FORM CARD ===== */}
         <div className="-mt-20 px-6">
-          <div className="bg-[#143d63] rounded-3xl p-6 shadow-xl">
-
+          <div className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 shadow-2xl">
             <h1 className="text-white text-2xl font-bold text-center">
               Welcome Back
             </h1>
@@ -106,7 +105,6 @@ export default function Login() {
 
             {/* FORM */}
             <form onSubmit={submit} className="mt-6 space-y-4">
-
               {/* USERNAME */}
               <div>
                 <label className="text-sm text-gray-300">
@@ -118,7 +116,7 @@ export default function Login() {
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   autoComplete="username"
-                  className="mt-1 w-full rounded-lg bg-gray-100 px-3 py-2 outline-none"
+                  className="mt-1 w-full rounded-lg bg-white/90 px-3 py-2 text-slate-900 outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-blue-400"
                 />
               </div>
 
@@ -134,14 +132,19 @@ export default function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     autoComplete="current-password"
-                    className="mt-1 w-full rounded-lg bg-gray-100 px-3 py-2 outline-none pr-10"
+                    className="mt-1 w-full rounded-lg bg-white/90 px-3 py-2 text-slate-900 outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-blue-400 pr-10"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800"
+                    aria-label="Toggle password"
                   >
-                    {showPassword ? "🙈" : "👁"}
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -160,7 +163,7 @@ export default function Login() {
               {/* BUTTON */}
               <button
                 disabled={loading}
-                className="w-full bg-orange-400 hover:bg-orange-500 text-white py-3 rounded-xl font-semibold transition disabled:opacity-60"
+                className="w-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white py-3 rounded-xl font-semibold transition disabled:opacity-60"
               >
                 {loading ? "Logging in..." : "Login"}
               </button>
@@ -175,7 +178,6 @@ export default function Login() {
                 Admin
               </span>
             </p>
-
           </div>
         </div>
       </div>

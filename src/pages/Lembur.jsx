@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 import api from "../api/axios";
 import MobileLayout from "../layout/MobileLayout";
 
@@ -44,7 +45,8 @@ export default function Lembur() {
       await loadData();
     } catch (err) {
       setError(
-        err.response?.data?.message || "Gagal mengajukan lembur"
+        err.response?.data?.message ||
+          "Gagal mengajukan lembur"
       );
     } finally {
       setSubmitting(false);
@@ -68,16 +70,17 @@ export default function Lembur() {
       {/* ================= AJUKAN ================= */}
       <button
         onClick={() => setShowForm(!showForm)}
-        className="w-full mb-4 bg-blue-600 text-white py-3 rounded-xl font-semibold"
+        className="w-full mb-4 bg-blue-600 text-white py-3 rounded-xl font-semibold inline-flex items-center justify-center gap-2 transition hover:bg-blue-700"
       >
-        {showForm ? "Tutup Form" : "➕ Ajukan Lembur"}
+        <Plus className="w-4 h-4" />
+        {showForm ? "Tutup Form" : "Ajukan Lembur"}
       </button>
 
       {/* ================= FORM ================= */}
       {showForm && (
         <form
           onSubmit={submit}
-          className="bg-white p-4 rounded-xl mb-4 space-y-3 shadow"
+          className="app-card app-card-hover p-4 mb-4 space-y-3"
         >
           {error && (
             <div className="bg-red-100 text-red-600 text-sm p-2 rounded">
@@ -90,19 +93,19 @@ export default function Lembur() {
             value={tanggal}
             onChange={(e) => setTanggal(e.target.value)}
             required
-            className="w-full border rounded p-2"
+            className="w-full border border-slate-200 rounded-lg p-2 bg-white/80"
           />
 
           <textarea
             placeholder="Keterangan lembur (opsional)"
             value={keterangan}
             onChange={(e) => setKeterangan(e.target.value)}
-            className="w-full border rounded p-2"
+            className="w-full border border-slate-200 rounded-lg p-2 bg-white/80"
           />
 
           <button
             disabled={submitting}
-            className="w-full bg-green-600 text-white py-2 rounded font-semibold disabled:opacity-50"
+            className="w-full bg-emerald-600 text-white py-2 rounded-lg font-semibold transition hover:bg-emerald-700 disabled:opacity-50"
           >
             {submitting ? "Mengirim..." : "Kirim Pengajuan"}
           </button>
@@ -118,7 +121,7 @@ export default function Lembur() {
         <div className="text-center text-gray-400 mt-10">
           <p className="text-lg font-semibold">Belum ada lembur</p>
           <p className="text-sm mt-1">
-            Gunakan tombol “Ajukan Lembur”
+            Gunakan tombol "Ajukan Lembur"
           </p>
         </div>
       ) : (
@@ -126,14 +129,14 @@ export default function Lembur() {
           {list.map((item) => (
             <div
               key={item.id}
-              className="bg-white p-3 rounded-xl shadow"
+              className="app-card app-card-hover p-3"
             >
               <p className="font-semibold">{item.tanggal}</p>
 
               <p className="text-sm text-gray-600">
                 Mulai: {item.jam_mulai}
                 {item.jam_selesai &&
-                  ` • Selesai: ${item.jam_selesai}`}
+                  ` - Selesai: ${item.jam_selesai}`}
               </p>
 
               <p className="text-xs text-gray-500">
@@ -142,16 +145,15 @@ export default function Lembur() {
 
               {/* STATUS */}
               <span
-                className={`inline-block mt-2 px-2 py-1 text-xs rounded font-semibold
-                  ${
-                    item.status === "finished"
-                      ? "bg-green-100 text-green-700"
-                      : item.status === "approved"
+                className={`app-chip mt-2 ${
+                  item.status === "finished"
+                    ? "bg-emerald-100 text-emerald-700"
+                    : item.status === "approved"
                       ? "bg-blue-100 text-blue-700"
                       : item.status === "requested"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
+                        ? "bg-amber-100 text-amber-700"
+                        : "bg-rose-100 text-rose-700"
+                }`}
               >
                 {item.status}
               </span>
@@ -160,7 +162,7 @@ export default function Lembur() {
               {item.status === "approved" && (
                 <button
                   onClick={() => selesai(item.id)}
-                  className="mt-3 w-full bg-red-600 text-white py-2 rounded font-semibold"
+                  className="mt-3 w-full bg-rose-600 text-white py-2 rounded-lg font-semibold transition hover:bg-rose-700"
                 >
                   Selesai Lembur
                 </button>

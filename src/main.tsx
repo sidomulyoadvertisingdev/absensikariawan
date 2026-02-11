@@ -6,7 +6,9 @@ import "./index.css";
 /* 🔐 AUTH PROVIDER */
 import { AuthProvider } from "./auth/AuthProvider";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+ReactDOM.createRoot(
+  document.getElementById("root")!
+).render(
   <React.StrictMode>
     <AuthProvider>
       <App />

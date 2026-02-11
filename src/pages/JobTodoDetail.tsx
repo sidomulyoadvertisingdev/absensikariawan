@@ -23,7 +23,7 @@ export default function JobTodoDetail() {
 
     api
       .get(`/job-todos/${id}`)
-      .then((res) => setJob(res.data))
+      .then((res: { data: JobTodo }) => setJob(res.data))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -59,7 +59,7 @@ export default function JobTodoDetail() {
   /* ================= DETAIL JOB ================= */
   return (
     <MobileLayout title="Detail Job">
-      <div className="bg-white rounded-xl p-4 shadow">
+      <div className="app-card app-card-hover p-4">
         <h2 className="font-bold text-lg mb-2">{job.title}</h2>
 
         <div
@@ -77,7 +77,7 @@ export default function JobTodoDetail() {
         {job.status !== "done" && (
           <button
             onClick={selesai}
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-semibold transition"
           >
             Tandai Selesai
           </button>

@@ -214,7 +214,7 @@ export default function Absensi() {
       )}
 
       {/* ================= WAKTU ================= */}
-      <div className="bg-white rounded-xl p-3 mb-4 shadow text-center">
+      <div className="app-card app-card-hover p-3 mb-4 text-center">
         <p className="text-sm text-gray-500">{tanggalHariIni}</p>
         <p className="text-xl font-bold text-blue-600">{jamSekarang}</p>
       </div>
@@ -249,7 +249,7 @@ export default function Absensi() {
       </div>
 
       {/* ================= STATUS ================= */}
-      <div className="bg-white rounded-xl p-4 shadow mb-4">
+      <div className="app-card app-card-hover p-4 mb-4">
         <p className="text-sm font-semibold mb-2">STATUS HARI INI</p>
         <div className="text-sm text-gray-600 space-y-1">
           <p>Masuk: {status?.jam_masuk || "--:--"}</p>

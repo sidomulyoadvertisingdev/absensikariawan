@@ -62,8 +62,8 @@ export default function Profile() {
   return (
     <MobileLayout title="Profile">
       {/* ================= HEADER ================= */}
-      <div className="bg-blue-600 text-white rounded-xl p-4 mb-4 shadow flex items-center gap-4">
-        <div className="w-14 h-14 rounded-full bg-white text-blue-600 flex items-center justify-center text-2xl font-bold">
+      <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 text-white rounded-2xl p-4 mb-4 shadow-lg shadow-blue-200/60 flex items-center gap-4">
+        <div className="w-14 h-14 rounded-full bg-white/90 text-blue-700 flex items-center justify-center text-2xl font-bold shadow">
           {initial}
         </div>
 
@@ -75,7 +75,7 @@ export default function Profile() {
       </div>
 
       {/* ================= INFO AKUN ================= */}
-      <div className="bg-white rounded-xl shadow p-4 mb-4">
+      <div className="app-card app-card-hover p-4 mb-4">
         <p className="text-sm font-semibold mb-3 text-gray-700">
           INFORMASI AKUN
         </p>
@@ -105,10 +105,10 @@ export default function Profile() {
       </div>
 
       {/* ================= AKSI ================= */}
-      <div className="bg-white rounded-xl shadow p-4">
+      <div className="app-card app-card-hover p-4">
         <button
           onClick={handleLogout}
-          className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-semibold transition"
+          className="w-full bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-semibold transition"
         >
           Logout
         </button>

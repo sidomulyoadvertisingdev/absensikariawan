@@ -1,16 +1,27 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 import api from "../api/axios";
 import MobileLayout from "../layout/MobileLayout";
 
+type Job = {
+  id: number;
+  title: string;
+  status: string;
+};
+
 export default function JobTodo() {
   const navigate = useNavigate();
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get("/job-todos/my")
-      .then((res) => setJobs(res.data.data || []))
+    api
+      .get("/job-todos/my")
+      .then(
+        (res: { data?: { data?: Job[] } }) =>
+          setJobs(res.data?.data || [])
+      )
       .finally(() => setLoading(false));
   }, []);
 
@@ -21,7 +32,7 @@ export default function JobTodo() {
           <div className="h-20 bg-gray-200 rounded-xl" />
         </div>
       ) : (
-        <div className="bg-white rounded-xl p-4 shadow">
+        <div className="app-card app-card-hover p-4">
           <p className="text-sm font-semibold mb-3">
             JOB YANG SAYA KERJAKAN
           </p>
@@ -35,7 +46,7 @@ export default function JobTodo() {
               {jobs.map((job) => (
                 <div
                   key={job.id}
-                  className="border rounded-lg p-3 flex justify-between items-center"
+                  className="border border-slate-200/70 rounded-xl p-3 flex justify-between items-center bg-white/70 transition hover:bg-white"
                 >
                   <div>
                     <p className="font-semibold text-sm">
@@ -48,9 +59,10 @@ export default function JobTodo() {
 
                   <button
                     onClick={() => navigate(`/job-todo/${job.id}`)}
-                    className="text-indigo-600 text-sm font-semibold"
+                    className="inline-flex items-center gap-1 text-indigo-600 text-sm font-semibold hover:text-indigo-700"
                   >
-                    Kerjakan →
+                    Kerjakan
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               ))}
