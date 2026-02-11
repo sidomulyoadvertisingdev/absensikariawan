@@ -8,6 +8,8 @@
     "types": ["vite/client"],
     "skipLibCheck": true,
     "allowJs": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "checkJs": false,
 
     /* Bundler mode */
